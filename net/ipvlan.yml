@@ -1,0 +1,65 @@
+version: "3.9"
+
+networks:
+  bridge-net:
+    name: bridge-net
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.0.0/24
+  ipvlan10:
+    name: ipvlan10
+    driver: ipvlan
+    driver_opts:
+      parent: enp5s0.10
+      ipvlan-mode: l3
+    ipam:
+      config:
+        - subnet: 10.10.10.0/24
+  ipvlan20:
+    name: ipvlan20
+    driver: ipvlan
+    driver_opts:
+      parent: enp5s0.20
+      ipvlan-mode: l3
+    ipam:
+      config:
+        - subnet: 10.10.20.0/24
+services:
+  node-01:
+    container_name: node-01
+    image: mbrav/docker-net:0.0.1
+    restart: always
+    build:
+      context: .
+      dockerfile: ./container/Dockerfile
+    command:
+      - "--interval"
+      - "30"
+      - "--count"
+      - "5"
+      - "ping"
+      - "10.10.10.20 10.10.20.20"
+    networks:
+      bridge-net:
+      ipvlan10:
+        ipv4_address: 10.10.10.10
+
+  node-02:
+    container_name: node-02
+    image: mbrav/docker-net:0.0.1
+    restart: always
+    build:
+      context: .
+      dockerfile: ./container/Dockerfile
+    command:
+      - "--interval"
+      - "30"
+      - "--count"
+      - "5"
+      - "ping"
+      - "10.10.10.10 10.10.20.10"
+    networks:
+      bridge-net:
+      ipvlan20:
+        ipv4_address: 10.10.20.20

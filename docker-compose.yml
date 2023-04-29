@@ -1,0 +1,113 @@
+version: "3.9"
+networks:
+  bridge-net:
+    name: bridge-net
+    driver: bridge
+    ipam:
+      config:
+        # 10.100.0.0 - 10.100.255.255 Range
+        - subnet: 10.100.0.0/16
+          gateway: 10.100.0.254
+services:
+  # traefik:
+  #   image: traefik:v3.0
+  #   container_name: traefik
+  #   ports:
+  #     - 80:80
+  #     - 443:443
+  #     - 8080:8080  # Web UI
+  #   volumes:
+  #     # - ./services/traefik:/etc/traefik
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #   command:
+  #     - --api.insecure=true
+  #     - --providers.docker
+  #   networks:
+  #     bridge-net:
+  #       ipv4_address: 10.100.1.1
+  prometheus:
+    image: prom/prometheus:v2.43.0
+    container_name: prometheus
+    restart: unless-stopped
+    # labels:
+    #   - "traefik.http.routers.prometheus.rule=Host(`prom.docker.localhost`)"
+    ports:
+      - 9090:9090
+    volumes:
+      - prometheus-data:/prometheus
+      - ./services/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    networks:
+      bridge-net:
+        ipv4_address: 10.100.2.1
+  grafana:
+    image: grafana/grafana-oss:9.4.7
+    container_name: grafana
+    restart: unless-stopped
+    # labels:
+    #   - "traefik.http.routers.grafana.rule=Host(`grafana.docker.localhost`)"
+    depends_on:
+      - prometheus
+    environment:
+      GF_INSTALL_PLUGINS: grafana-simple-json-datasource
+      GF_SECURITY_ADMIN_USER: monitoring
+      GF_SECURITY_ADMIN_PASSWORD: monitoring
+    ports:
+      - 3000:3000
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./services/grafana/grafana.ini:/etc/grafana/grafana.ini
+      - ./services/grafana/provisioning:/etc/grafana/provisioning
+    networks:
+      bridge-net:
+        ipv4_address: 10.100.2.2
+  loki:
+    image: grafana/loki:2.7.5
+    container_name: loki
+    restart: unless-stopped
+    # labels:
+    #   - "traefik.http.routers.loki.rule=Host(`loki.docker.localhost`)"
+    volumes:
+      - ./services/loki/config.yml:/etc/loki/config.yml
+    ports:
+      - 3100:3100
+    command: -config.file=/etc/loki/config.yml
+    networks:
+      bridge-net:
+        ipv4_address: 10.100.2.3
+  node-exporter:
+    image: prom/node-exporter:v1.5.0
+    container_name: node-exporter
+    restart: unless-stopped
+    depends_on:
+      - prometheus
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - "--path.procfs=/host/proc"
+      - "--path.rootfs=/rootfs"
+      - "--path.sysfs=/host/sys"
+      - "--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)"
+    networks:
+      bridge-net:
+        ipv4_address: 10.100.3.1
+  promtail:
+    image: grafana/promtail:2.7.4
+    container_name: promtail
+    restart: unless-stopped
+    depends_on:
+      - loki
+    volumes:
+      - /var/lib/docker/containers:/var/lib/docker/containers
+      - /var/log:/var/log
+      - ./services/promtail/config.yml:/etc/promtail/config.yml
+    command: -config.file=/etc/promtail/config.yml
+    networks:
+      bridge-net:
+        ipv4_address: 10.100.3.2
+volumes:
+  prometheus-data:
+  grafana-data:
