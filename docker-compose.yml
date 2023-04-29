@@ -9,6 +9,24 @@ networks:
         - subnet: 10.100.0.0/16
           gateway: 10.100.0.254
 services:
+  docker-net-1:
+    image: mbrav/docker-net:0.1.0
+    build:
+      context: .
+      dockerfile: container/docker-net/Dockerfile
+    container_name: docker-net-1
+    command:
+      [
+        "ping",
+        "--verbose",
+        "--hosts",
+        "prometheus,grafana,loki,node-exporter,promtail",
+        "--interval",
+        "30"
+      ]
+    networks:
+      bridge-net:
+        ipv4_address: 10.100.0.1
   # traefik:
   #   image: traefik:v3.0
   #   container_name: traefik
