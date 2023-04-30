@@ -28,6 +28,7 @@ scrape_configs:
     static_configs:
       - targets:
           - grafana:3000
+  # Node exporter for system host
   - job_name: node-exporter
     honor_timestamps: true
     metrics_path: /metrics
@@ -36,3 +37,30 @@ scrape_configs:
     static_configs:
       - targets:
           - node-exporter:9100
+  # KVM Kubernetes master node 1
+  - job_name: node-exporter-k8s-ctrl-1
+    honor_timestamps: true
+    metrics_path: /metrics
+    scheme: http
+    follow_redirects: true
+    static_configs:
+      - targets:
+          - 192.168.122.89:9100
+  # KVM Kubernetes worker node 1
+  - job_name: node-exporter-k8s-wrk-1
+    honor_timestamps: true
+    metrics_path: /metrics
+    scheme: http
+    follow_redirects: true
+    static_configs:
+      - targets:
+          - 192.168.122.192:9100
+  # KVM Kubernetes worker node 2
+  - job_name: node-exporter-k8s-wrk-2
+    honor_timestamps: true
+    metrics_path: /metrics
+    scheme: http
+    follow_redirects: true
+    static_configs:
+      - targets:
+          - 192.168.122.97:9100

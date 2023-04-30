@@ -29,7 +29,15 @@ services:
       context: .
       dockerfile: container/docker-net/Dockerfile
     container_name: docker-net-1
-    command: ["ping", "--verbose", "--hosts", "prometheus,grafana,loki,node-exporter,promtail", "--interval", "30"]
+    command:
+      [
+        "ping",
+        "--verbose",
+        "--hosts",
+        "prometheus,grafana,loki,node-exporter,promtail",
+        "--interval",
+        "30"
+      ]
     networks:
       bridge-net:
         ipv4_address: 10.100.0.1
@@ -39,7 +47,15 @@ services:
       context: .
       dockerfile: container/docker-net/Dockerfile
     container_name: docker-net-2
-    command: ["ping", "--verbose", "--hosts", "192.168.122.89,192.168.122.97,192.168.122.192", "--interval", "30"]
+    command:
+      [
+        "ping",
+        "--verbose",
+        "--hosts",
+        "192.168.122.89,192.168.122.97,192.168.122.192",
+        "--interval",
+        "30"
+      ]
     networks:
       kvm-net:
         ipv4_address: 192.168.122.200
