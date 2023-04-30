@@ -1,13 +1,27 @@
 version: "3.9"
 networks:
+  # Network for docker
+  # Range: 10.100.0.0 - 10.100.255.255
   bridge-net:
     name: bridge-net
     driver: bridge
     ipam:
       config:
-        # 10.100.0.0 - 10.100.255.255 Range
         - subnet: 10.100.0.0/16
           gateway: 10.100.0.254
+  # KVM network with VMs
+  kvm-net:
+    name: kvm-net
+    driver: macvlan
+    driver_opts:
+      parent: virbr0
+    ipam:
+      config:
+        - subnet: 192.168.122.0/24
+          gateway: 192.168.122.1
+          # Usable IPS's 192.168.122.193 - 192.168.122.254
+          # Otherwise use 192.168.122.0/24
+          ip_range: 192.168.122.192/26
 services:
   docker-net-1:
     image: mbrav/docker-net:0.1.0
@@ -15,18 +29,20 @@ services:
       context: .
       dockerfile: container/docker-net/Dockerfile
     container_name: docker-net-1
-    command:
-      [
-        "ping",
-        "--verbose",
-        "--hosts",
-        "prometheus,grafana,loki,node-exporter,promtail",
-        "--interval",
-        "30"
-      ]
+    command: ["ping", "--verbose", "--hosts", "prometheus,grafana,loki,node-exporter,promtail", "--interval", "30"]
     networks:
       bridge-net:
         ipv4_address: 10.100.0.1
+  docker-net-2:
+    image: mbrav/docker-net:0.1.0
+    build:
+      context: .
+      dockerfile: container/docker-net/Dockerfile
+    container_name: docker-net-2
+    command: ["ping", "--verbose", "--hosts", "192.168.122.89,192.168.122.97,192.168.122.192", "--interval", "30"]
+    networks:
+      kvm-net:
+        ipv4_address: 192.168.122.200
   # traefik:
   #   image: traefik:v3.0
   #   container_name: traefik
@@ -59,8 +75,11 @@ services:
     networks:
       bridge-net:
         ipv4_address: 10.100.2.1
+      # Access KVM hosts as well
+      kvm-net:
+        ipv4_address: 192.168.122.210
   grafana:
-    image: grafana/grafana-oss:9.4.7
+    image: grafana/grafana-oss:9.5.1
     container_name: grafana
     restart: unless-stopped
     # labels:
@@ -81,7 +100,7 @@ services:
       bridge-net:
         ipv4_address: 10.100.2.2
   loki:
-    image: grafana/loki:2.7.5
+    image: grafana/loki:2.8.1
     container_name: loki
     restart: unless-stopped
     # labels:
@@ -113,7 +132,7 @@ services:
       bridge-net:
         ipv4_address: 10.100.3.1
   promtail:
-    image: grafana/promtail:2.7.4
+    image: grafana/promtail:2.8.1
     container_name: promtail
     restart: unless-stopped
     depends_on:
