@@ -26,8 +26,8 @@ services:
   docker-net-1:
     image: mbrav/docker-net:0.1.0
     build:
-      context: .
-      dockerfile: container/docker-net/Dockerfile
+      context: ../
+      dockerfile: ./docker-net/Dockerfile
     container_name: docker-net-1
     command:
       [
@@ -44,8 +44,8 @@ services:
   docker-net-2:
     image: mbrav/docker-net:0.1.0
     build:
-      context: .
-      dockerfile: container/docker-net/Dockerfile
+      context: ../
+      dockerfile: ./docker-net/Dockerfile
     container_name: docker-net-2
     command:
       [
@@ -165,4 +165,6 @@ services:
         ipv4_address: 10.100.3.2
 volumes:
   prometheus-data:
+    name: prometheus-data
   grafana-data:
+    name: grafana-data

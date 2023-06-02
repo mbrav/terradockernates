@@ -1,14 +1,14 @@
 # Dockernates
 
-Various docker configurations that integrate with a Kubernates running inside a KVM virtualization enviornment.
+Various docker configurations that integrate with a Kubernates running inside a KVM virtualization enviornment and integration with other components running inside docker such as minikube.
 
-### Use cases
+## Use cases
 
-This repository consists of docker-compose configurations for services which might not yet be ready to be integrated with Kubernetes.
+This repository consists of docker-compose configurations for services.
 
-## Docker and KVM integration
+## ℹ️Docker and KVM integration
 
-### Intagrating KVM's `default` network with Docker
+### Integrating KVM's `default` network with Docker
 
 To allow docker containers access the same network as KVM's net (`virb0`) a MacVLAN van be created:
 
