@@ -1,0 +1,41 @@
+version: "3.9"
+networks:
+  # Network configured by defulat with minikube using docker driver
+  minikube:
+    name: minikube
+    external: true
+services:
+  docker-net-1:
+    image: mbrav/docker-net:0.1.0
+    build:
+      context: ../
+      dockerfile: ./docker-net/Dockerfile
+    container_name: docker-net-1
+    command: ["ping", "--verbose", "--hosts", "minikube,minkube-m02", "--interval", "30"]
+    networks:
+      minikube:
+        ipv4_address: 192.168.49.100
+  gitlab:
+    image: gitlab/gitlab-ce:16.0.1-ce.0
+    container_name: gitlab
+    restart: always
+    hostname: gitlab
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'https://gitlab.su'
+        # Add any other gitlab.rb configuration here, each on its own line
+    ports:
+      - 80:80
+      - 443:443
+      - 22:22
+    volumes:
+      - ./services/gitlab/gitlab.rb:/etc/gitlab/gitlab.rb
+      # - '$GITLAB_HOME/logs:/var/log/gitlab'
+      - gitlab-data:/var/opt/gitlab
+    shm_size: 512m
+    networks:
+      minikube:
+        ipv4_address: 192.168.49.101
+volumes:
+  gitlab-data:
+    name: gitlab-data
