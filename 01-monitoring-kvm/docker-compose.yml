@@ -59,22 +59,24 @@ services:
     networks:
       kvm-net:
         ipv4_address: 192.168.122.200
-  # traefik:
-  #   image: traefik:v3.0
-  #   container_name: traefik
-  #   ports:
-  #     - 80:80
-  #     - 443:443
-  #     - 8080:8080  # Web UI
-  #   volumes:
-  #     # - ./services/traefik:/etc/traefik
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #   command:
-  #     - --api.insecure=true
-  #     - --providers.docker
-  #   networks:
-  #     bridge-net:
-  #       ipv4_address: 10.100.1.1
+        # traefik:
+        #   image: traefik:v2.10
+        #   container_name: traefik
+        #   ports:
+        #     - 80:80
+        #     - 443:443
+        #     - 8080:8080 # Web UI
+        #   volumes:
+        #     # - ./services/traefik:/etc/traefik
+        #     - /var/run/docker.sock:/var/run/docker.sock
+        #   command:
+        #     - --api.insecure=true
+        #     - --providers.docker
+        #   networks:
+        #     bridge-net:
+        #       ipv4_address: 10.100.1.1
+        #     kvm-net:
+        #       ipv4_address: 192.168.122.201
   prometheus:
     image: prom/prometheus:v2.43.0
     container_name: prometheus
