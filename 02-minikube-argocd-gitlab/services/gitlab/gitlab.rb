@@ -29,7 +29,7 @@
 ##! On AWS EC2 instances, we also attempt to fetch the public hostname/IP
 ##! address from AWS. For more details, see:
 ##! https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instancedata-data-retrieval.html
-# external_url 'GENERATED_EXTERNAL_URL'
+external_url 'https://gitlab.local'
 
 ## Roles for multi-instance GitLab
 ##! The default is to have no roles enabled, which results in GitLab running as an all-in-one instance.
@@ -130,7 +130,7 @@
 ##! `8`  for Light Green
 ##! `9`  for Red
 ##! `10` for Light Red
-# gitlab_rails['gitlab_default_theme'] = 2
+gitlab_rails['gitlab_default_theme'] = 2
 
 ### Default project feature settings
 # gitlab_rails['gitlab_default_projects_features_issues'] = true
@@ -239,7 +239,7 @@
 
 ### Monitoring settings
 ###! IP whitelist controlling access to monitoring endpoints
-# gitlab_rails['monitoring_whitelist'] = ['127.0.0.0/8', '::1/128']
+gitlab_rails['monitoring_whitelist'] = ['127.0.0.0/8', '::1/128', '192.168.49.0/24']
 
 ### Shutdown settings
 ###! Defines an interval to block healthcheck,
@@ -487,7 +487,7 @@
 # gitlab_rails['application_settings_cache_seconds'] = 60
 
 ### Usage Statistics
-# gitlab_rails['usage_ping_enabled'] = true
+gitlab_rails['usage_ping_enabled'] = false
 
 ### GitLab Mattermost
 ###! These settings are void if Mattermost is installed on the same omnibus
@@ -1515,7 +1515,7 @@
 ##! Docs: https://docs.gitlab.com/omnibus/settings/nginx.html
 ################################################################################
 
-# nginx['enable'] = true
+# nginx['enable'] = false
 # nginx['client_max_body_size'] = '250m'
 # nginx['redirect_http_to_https'] = false
 # nginx['redirect_http_to_https_port'] = 80

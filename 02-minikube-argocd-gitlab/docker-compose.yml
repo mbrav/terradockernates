@@ -11,25 +11,24 @@ services:
       context: ../
       dockerfile: ./docker-net/Dockerfile
     container_name: docker-net-1
+    restart: always
+    hostname: docker-net-1.local
     command: ["ping", "--verbose", "--hosts", "minikube,minkube-m02", "--interval", "30"]
     networks:
       minikube:
         ipv4_address: 192.168.49.100
   gitlab:
-    image: gitlab/gitlab-ce:16.0.1-ce.0
+    # image: gitlab/gitlab-ce:16.0.1-ce.0
+    image: gitlab/gitlab-ce:15.11.6-ce.0
     container_name: gitlab
     restart: always
-    hostname: gitlab
-    environment:
-      GITLAB_OMNIBUS_CONFIG: |
-        external_url 'https://gitlab.su'
-        # Add any other gitlab.rb configuration here, each on its own line
+    hostname: gitlab.local
     ports:
       - 80:80
       - 443:443
       - 22:22
     volumes:
-      - ./services/gitlab/gitlab.rb:/etc/gitlab/gitlab.rb
+      - ./services/gitlab/gitlab.rb:/etc/gitlab/gitlab.rb:ro
       # - '$GITLAB_HOME/logs:/var/log/gitlab'
       - gitlab-data:/var/opt/gitlab
     shm_size: 512m
